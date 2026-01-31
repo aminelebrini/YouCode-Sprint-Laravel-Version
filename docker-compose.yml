@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+      args:
+        UID: 1000
+        GID: 1000
+    container_name: youcode_sprint_app
+    ports:
+      - "8087:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    dns:
+    - 8.8.8.8
+    - 1.1.1.1
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgsql_admin
+    restart: always
+    ports:
+      - "5051:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: aminelebrini32@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: "123456"
+      POSTGRES_DB: youcode_sprint_app
+    depends_on:
+      - db
+
+  db:
+    container_name: youcode_pgsql
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: youcode_sprint_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
