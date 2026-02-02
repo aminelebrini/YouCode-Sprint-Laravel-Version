@@ -18,3 +18,7 @@ require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
 $app->handleRequest(Request::capture());
+
+//  $c = '123456';
+//     $vc = password_hash($c, PASSWORD_BCRYPT);
+//     echo $vc;
