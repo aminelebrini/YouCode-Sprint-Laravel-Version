@@ -2,122 +2,112 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classe;
+use App\Models\User;
 use Illuminate\Http\Request;
-use  App\Http\Services\AdminService;
+use App\Http\Services\AdminService;
 
 class AdminController extends Controller
 {
-    private $AdminService;
-    public function __construct(AdminService $AdminService)
-    {
-        $this->AdminService = $AdminService;
-    }
-    public function Create()
-    {
-        $nom = request('nom');
-        $prenom = request('prenom');
-        $role = request('role');
-        $email = request('email');
-        $password = request('password');
+    private AdminService $adminService;
 
-        echo $nom;
-        if($this->AdminService->CreateUser($nom, $prenom, $role, $email, $password))
-        {
-            return redirect()
-                ->route('admindash')
-                ->with('success', 'Compte créé avec succès');
-        } else {
-            return redirect()
-                ->route('admindash')
-                ->withErrors(['error' => 'Erreur lors de la création']);
-        }
-    }
-    public function addSprint()
+    public function __construct(AdminService $adminService)
     {
-        $titre = $_POST['titre'] ?? null;
-        $dateDebut = $_POST['date_debut'] ?? null;
-        $dateFin = $_POST['date_fin'] ?? null;
-
-        if($this->AdminService->createSprint($titre, $dateDebut, $dateFin))
-        {
-            header('Location: /admindash');
-            exit();
-        } else {
-            die("Erreur lors de l'ajout du sprint");
-        }
+        $this->adminService = $adminService;
     }
 
-    public function add_class()
+    public function create(Request $request)
     {
-        $nom = $_POST['class_name'];
-        $capacity = $_POST['capacity'];
-        $annescolaire = $_POST['annee_scolaire'];
+        $request->validate([
+            'nom'      => 'required|string',
+            'prenom'   => 'required|string',
+            'role'     => 'required|string',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
 
-        if($this->AdminService->CreateClasse($nom,$capacity,$annescolaire))
-        {
-            header('Location: /admindash');
-            exit();
-        } else {
-            die("Erreur lors de l'ajout du classe");
-        }
+        $this->adminService->createUser(
+            $request->nom,
+            $request->prenom,
+            $request->role,
+            $request->email,
+            $request->password
+        );
+
+        return redirect()
+            ->route('admindash')
+            ->with('success', 'Compte créé avec succès');
     }
 
-    public function assignation()
+    public function addSprint(Request $request)
     {
-        if($_SERVER['REQUEST_METHOD'] === 'POST')
-        {
-            $ClasseId = $_POST['class_id'];
-            $FormateurId = $_POST['teacher_id'];
+        $request->validate([
+            'titre'      => 'required|string',
+            'date_debut' => 'required|date',
+            'date_fin'   => 'required|date|after_or_equal:date_debut',
+        ]);
 
-            if(!$this->AdminService->AssignerFormateur($ClasseId,$FormateurId))
-            {
-                die("Erreur lors de l'ajout du fromateur");
+        $this->adminService->createSprint(
+            $request->titre,
+            $request->date_debut,
+            $request->date_fin
+        );
 
-            }
-            header('Location: /admindash');
-            exit();
-        }
+        return redirect()->route('admindash')->with('success', 'Sprint ajouté');
     }
 
-    public function add_skill()
+    public function addClass(Request $request)
     {
-        $ComperenceName = $_POST['competence_name'];
+        $request->validate([
+            'class_name'     => 'required|string',
+            'capacity'       => 'required|integer',
+            'annee_scolaire' => 'required|string',
 
-        if($_SERVER['REQUEST_METHOD'] === 'POST')
-        {
-            if(!$this->AdminService->addSkill($ComperenceName))
-            {
-                die("Erreur lors de l'ajout du Competence");
+        ]);
 
-            }
-            header('Location: /admindash');
-            exit();
-        }
+        $this->adminService->createClasse(
+            $request->class_name,
+            $request->capacity,
+            $request->annee_scolaire
+        );
 
+        return redirect()->route('admindash')->with('success', 'Classe ajoutée');
     }
 
-//    public function modifier_info()
-//    {
-//
-//    }
+    public function assignation(Request $request)
+    {
+        $request->validate([
+            'class_id'   => 'required|exists:classes,id',
+            'teacher_id'=> 'required|exists:users,id',
+        ]);
 
+        $this->adminService->assignerFormateur(
+            $request->class_id,
+            $request->teacher_id
+        );
+
+        return redirect()->route('admindash')->with('success', 'Formateur assigné');
+    }
+
+    public function addCompetence(Request $request)
+    {
+        $request->validate([
+            'competence_name' => 'required|string',
+        ]);
+
+        $this->adminService->addSkill($request->competence_name);
+
+        return redirect()->route('admindash')->with('success', 'Compétence ajoutée');
+    }
 
     public function index()
     {
-        $sprints = $this->AdminService->get_Sprints() ?? [];
-        $users = $this->AdminService->getUsers() ?? [];
-        $classes = $this->AdminService->get_Classes() ?? [];
-        $competences = $this->AdminService->get_Competence() ?? [];
 
-//        $sprints = [];
-//        $users = [];
-//        $classes = [];
-//        $competences = [];
         return view('admindash', [
-            'sprints' => $sprints,
-            'users' => $users,
-            'classes' => $classes,
-            'competences' => $competences
+            'sprints'     => $this->adminService->getSprints(),
+            'users'       => $this->adminService->getUsers(),
+            'classes'     => Classe::with('formateurs')->get(),
+            'competences' => $this->adminService->getCompetences(),
         ]);
     }
 }

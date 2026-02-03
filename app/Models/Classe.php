@@ -28,6 +28,10 @@ class Classe extends Model
 
     public function formateurs()
     {
-        return $this->belongsToMany(User::class, 'formateurs_classe', 'classe_id', 'formateur_id');
-    }
+        return $this->belongsToMany(
+            User::class,
+            'formateurs_classe',
+            'classe_id',
+            'formateur_id'
+        )->where('role', 'Formateur');    }
 }

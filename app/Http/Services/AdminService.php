@@ -1,54 +1,73 @@
 <?php
 
 namespace App\Http\Services;
+
 use App\Http\Repository\AdminRepository;
+use Illuminate\Support\Facades\Hash;
 
 class AdminService
 {
-    private $AdminRepository;
+    private AdminRepository $adminRepository;
+
     public function __construct(AdminRepository $adminRepository)
     {
-        $this->AdminRepository = $adminRepository;
+        $this->adminRepository = $adminRepository;
     }
-    public function CreateUser($nom, $prenom, $role,$email,$password)
+
+    /* ========== USERS ========== */
+    public function createUser($nom, $prenom, $role, $email, $password)
     {
-        return $this->AdminRepository->create_users($nom, $prenom, $role,$email,$password);
+        return $this->adminRepository->createUser([
+            'firstname' => $nom,
+            'lastname'  => $prenom,
+            'role'      => $role,
+            'email'     => $email,
+            'password'  => Hash::make($password),
+        ]);
     }
-    public function CreateClasse($nom,$capacity,$annescolaire)
+
+    /* ========== CLASSES ========== */
+    public function createClasse($nom, $capacity, $anneeScolaire)
     {
-        return $this->AdminRepository->Create_Classe($nom,$capacity,$annescolaire);
+        return $this->adminRepository->createClasse($nom, $capacity, $anneeScolaire);
     }
+
+    /* ========== SPRINTS ========== */
     public function createSprint($titre, $dateDebut, $dateFin)
     {
-        return $this->AdminRepository->createSprint($titre, $dateDebut, $dateFin);
-    }
-    public function AssignerFormateur($ClasseId,$FormateurId)
-    {
-        return $this->AdminRepository->Assigne($ClasseId,$FormateurId);
-    }
-    public function addSkill($ComperenceName)
-    {
-        return $this->AdminRepository->add_Skill($ComperenceName);
-    }
-    public function get_Sprints()
-    {
-       return $sprints = $this->AdminRepository->getSprint();
-
-    }
-    public function get_Classes()
-    {
-        $classes = $this->AdminRepository->getClasses();
-        return $classes ?? [];
-    }
-    public function get_Competence()
-    {
-        $comperences = $this->AdminRepository->getCompetence();
-        return $comperences ?? [];
+        return $this->adminRepository->createSprint($titre, $dateDebut, $dateFin);
     }
 
+    /* ========== ASSIGNATION ========== */
+    public function assignerFormateur($classeId, $formateurId)
+    {
+        return $this->adminRepository->assignerFormateur($classeId, $formateurId);
+    }
+
+    /* ========== SKILLS ========== */
+    public function addSkill($competenceName)
+    {
+        return $this->adminRepository->addSkill($competenceName);
+    }
+
+    /* ========== GETTERS ========== */
     public function getUsers()
     {
-        return $this->AdminRepository->getUsers();
+        return $this->adminRepository->getUsers();
+    }
+
+    public function getSprints()
+    {
+        return $this->adminRepository->getSprints() ?? [];
+    }
+
+    public function getClasses()
+    {
+        return $this->adminRepository->getClasses() ?? [];
+    }
+
+    public function getCompetences()
+    {
+        return $this->adminRepository->getCompetences() ?? [];
     }
 }
-?>

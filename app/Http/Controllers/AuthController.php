@@ -17,7 +17,7 @@ class AuthController extends Controller
 
     public function show()
     {
-        return view('home'); // Login page
+        return view('home');
     }
 
     public function login(Request $request)
@@ -39,11 +39,13 @@ class AuthController extends Controller
         ]);
 
         if ($user->role === 'admin') return redirect()->route('admindash');
+        if ($user->role === 'Formateur') return redirect()->route('formateurdash');
+
     }
 
     public function logout()
     {
-        $this->AuthService->logout();
+        Auth::logout();
         return redirect()->route('login');
     }
 }

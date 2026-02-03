@@ -67,12 +67,10 @@
         </nav>
 
         <div class="mt-auto pt-6 border-t border-white/5">
-            <form action="/logout" method="POST">
-                <button class="w-full flex items-center space-x-4 text-red-400/60 hover:text-red-400 px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all">
-                    <i class="fas fa-power-off"></i>
-                    <span>Déconnexion</span>
-                </button>
-            </form>
+            <a href="/logout" class="w-full flex items-center space-x-4 text-red-400/60 hover:text-red-400 px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all">
+                <i class="fas fa-power-off"></i>
+                <span>Déconnexion</span>
+            </a>
         </div>
     </aside>
 
@@ -107,8 +105,8 @@
                 <div class="mt-4 h-1 w-12 bg-green-500 rounded-full group-hover:w-full transition-all duration-700"></div>
             </div>
             <div class="glass-card p-8 rounded-[2rem] group hover:border-cyan-400/50 transition-all duration-500">
-                <p class="text-cyan-400/60 text-[10px] uppercase font-black tracking-[0.2em] mb-2">Total Formateurs</p>
-                <h3 class="text-4xl font-black tracking-tighter italic">0</h3>
+                <p class="text-cyan-400/60 text-[10px] uppercase font-black tracking-[0.2em] mb-2">Total Classes</p>
+                <h3 class="text-4xl font-black tracking-tighter italic">{{ count($classes) }}</h3>
                 <div class="mt-4 h-1 w-12 bg-yellow-500 rounded-full group-hover:w-full transition-all duration-700"></div>
             </div>
         </div>
@@ -225,7 +223,9 @@
                             </td>
                             <td class="p-8">
                                 <div class="flex items-center gap-3">
-                                    <span class="text-white/70 font-medium">{{ $classe->formateur }}</span>
+                                    @foreach($classe->formateurs as $formateur)
+                                        {{ $formateur->firstname }} {{ $formateur->lastname }}
+                                    @endforeach
                                 </div>
                             </td>
                             <td class="p-8">
@@ -371,8 +371,8 @@
             </button>
         </div>
 
-        <form action="" method="POST" class="space-y-6">
-            @ec
+        <form action="{{ route('admin.classe') }}" method="POST" class="space-y-6">
+            @csrf
             <div class="space-y-2 text-left">
                 <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2 italic">Nom de la promotion</label>
                 <div class="relative group">
@@ -431,8 +431,8 @@
             </button>
         </div>
 
-        <form method="POST" action="/assignation">
-
+        <form method="POST" action="{{ route('admin.assiner') }}">
+            @csrf
             <div class="space-y-2 text-left group">
                 <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2 italic">
                     Sélectionner la Classe
@@ -499,7 +499,8 @@
             <button onclick="toggleModal('SkillModal')" class="text-white/20 hover:text-white transition-all"><i class="fas fa-times text-xl"></i></button>
         </div>
 
-        <form action="/add_skill" method="POST" class="space-y-8">
+        <form action="{{ route('admin.skills') }}" method="POST" class="space-y-8">
+            @csrf
             <div class="space-y-2 group text-left">
                 <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-4 italic group-focus-within:text-cyan-400 transition-colors">Désignation</label>
                 <div class="relative">
