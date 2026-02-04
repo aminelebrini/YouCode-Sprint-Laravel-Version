@@ -23,8 +23,8 @@ class AdminRepository
 
         if($user->role === 'formateur') {
             $formateur = Formateur::create([
-                'username' => strtolower($user->firstname . $user->lastname),
                 'user_id'  => $user->id,
+                'username' => strtolower($user->firstname . $user->lastname),
             ]);
         }
         return $user;

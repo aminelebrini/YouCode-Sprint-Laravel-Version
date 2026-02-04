@@ -38,8 +38,8 @@ class AuthController extends Controller
             ]);
         }
 
-        Auth::login($user);                    // ✅ Auth Laravel
-        $request->session()->regenerate();     // ✅ مهم
+        Auth::login($user);                    
+        $request->session()->regenerate();     
 
 //        dd(Auth::user());
 

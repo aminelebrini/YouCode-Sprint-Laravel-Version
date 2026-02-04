@@ -87,14 +87,6 @@
                     </div>
                 </div>
             </div>
-            @foreach($classes as $classe)
-    <p>ID: {{ $classe->id }}</p>
-    <p>Nom: {{ $classe->nom }}</p>
-    <p>Nombre d'étudiants: {{ $classe->nombre }}</p>
-    <p>Promo: {{ $classe->promo }}</p>
-    <p>Taux: {{ $classe->taux }}%</p>
-    <hr>
-    @endforeach
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
                 <div class="glass-card p-6 rounded-[2rem] border-l-4 border-l-cyan-400">
                     <p class="text-white/40 text-[9px] uppercase font-black tracking-widest mb-1">Briefs Lancés</p>
@@ -102,11 +94,11 @@
                 </div>
                 <div class="glass-card p-6 rounded-[2rem] border-l-4 border-l-purple-500">
                     <p class="text-white/40 text-[9px] uppercase font-black tracking-widest mb-1">Apprenants</p>
-                    <h3 class="text-2xl font-black italic">{{ count($etudiants) }}</h3>
+                    <h3 class="text-2xl font-black italic"></h3>
                 </div>
                 <div class="glass-card p-6 rounded-[2rem] border-l-4 border-l-yellow-500">
                     <p class="text-white/40 text-[9px] uppercase font-black tracking-widest mb-1">Rendus en attente</p>
-                    <h3 class="text-2xl font-black italic">08</h3>
+                    <h3 class="text-2xl font-black italic">{{ count($rendus) }}</h3>
                 </div>
                 <div class="glass-card p-6 rounded-[2rem] border-l-4 border-l-green-500">
                     <p class="text-white/40 text-[9px] uppercase font-black tracking-widest mb-1">Briefs Validés</p>
@@ -122,6 +114,7 @@
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     @foreach($briefs as $brief)
+                    @if($brief->formateur_id === auth()->user()->id)
                     <div class="glass-card p-8 rounded-[2.5rem] group hover:border-cyan-400/50 transition-all duration-500 relative overflow-hidden">
                         <div class="absolute top-0 right-0 p-6">
                             <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-[8px] font-black uppercase tracking-widest border border-green-500/20">
@@ -141,6 +134,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                     @endforeach
                 </div>
         </section>
@@ -163,34 +157,11 @@
                     <th class="p-8">username</th>
                 </tr>
             </thead>
-            <tbody class="text-sm">
-               @foreach($etudiants as $etudiant)
-                    <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
-                    <td class="p-8">
-                        <div class="flex items-center gap-4">
-                            <p class="font-black text-white uppercase tracking-tight italic">{{ $etudiant->user->firstname . " " . $etudiant->user->firstname }}</p>
-                        </div>
-                    </td>
-                    <td class="p-8 text-white/40">
-                        <div class="flex items-center gap-2">
-                             <span class="px-3 py-1 bg-cyan-400/10 text-cyan-400 border border-cyan-400/20 rounded-lg text-[9px] font-black uppercase tracking-[0.2em]">
-                                {{ $etudiant->level }}
-                            </span>
-                        </div>
-                    </td>
-                    <td class="p-8">
-                        <div class="flex items-center gap-4">
-                            <p class="font-black text-white uppercase tracking-tight italic">{{ $etudiant->user->email }}</p>
-                        </div>
-                    </td>
-                    <td class="p-8">
-                        <div class="flex items-center gap-4">
-                            <p class="font-black text-white tracking-tight italic">{{ $etudiant->username }}</p>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
+            @foreach($etudiants as $etudiant)
+    <p>{{ $etudiant->user->firstname }} {{ $etudiant->user->lastname }} - Classe: {{ $etudiant->classe->nom }}</p>
+@endforeach
+
+
                     </table>
                 </div>
             </section>
@@ -201,18 +172,15 @@
                         <i class="fas fa-history mr-3"></i>Historique des Rendus
                     </h2>
                 </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-{{--        @foreach($rendus as $rendu)--}}
-{{--        @foreach($competences as $competence)--}}
-{{--        @if($rendu->getFormateurId() === $_SESSION['id'])--}}
-{{--        @if(in_array($competence->getId(), $rendu->getCompetenceId()))--}}
-        <div class="glass-card p-6 rounded-[2rem] border-t-2 border-cyan-400/30 hover:border-cyan-400 transition-all duration-300">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            @foreach($rendus as $rendu)
+            <div class="glass-card p-6 rounded-[2rem] border-t-2 border-cyan-400/30 hover:border-cyan-400 transition-all duration-300">
             <div class="flex justify-between items-center mb-4">
                 <div class="w-10 h-10 rounded-xl bg-cyan-400/10 flex items-center justify-center text-cyan-400 border border-cyan-400/20">
                     <i class="fab fa-github text-xl"></i>
                 </div>
                 <h3 class="text-[10px] text-cyan-400 font-black uppercase tracking-[0.2em] italic">
-{{--                    {{ $rendu->getFullName() }}--}}
+                {{ $rendu->getFullName() }}
                 </h3>
                 <span class="px-3 py-1 bg-cyan-400/10 text-cyan-400 rounded-full text-[8px] font-black uppercase tracking-widest border border-cyan-400/20">
                     Envoyé
@@ -220,10 +188,10 @@
             </div>
 
             <h4 class="text-white font-black uppercase text-sm mb-1 italic truncate">
-{{--                {{ $rendu->getBriefName() }}--}}
+            {{ $rendu->description }}
             </h4>
             <p class="text-[9px] text-white/40 font-bold uppercase tracking-widest mb-4">
-{{--                Soumis le : <span class="text-white/60">{{ $rendu->getDateSoumission() }}</span>--}}
+                Soumis le : <span class="text-white/60">{{ $rendu->date_soumission }}</span>
             </p>
 
             <div class="space-y-3">
@@ -232,14 +200,14 @@
                     <i class="fas fa-external-link-alt text-[10px] text-white/20 group-hover:text-cyan-400"></i>
                 </a>
 
-{{--                @if($rendu->getCommentaire())--}}
+                <!-- @if($rendu->description)
                 <div class="p-3 bg-black/20 rounded-xl border border-white/5">
                     <p class="text-[15px] text-white italic leading-relaxed">
                         <i class="fas fa-quote-left mr-1 opacity-30"></i>
-{{--                        {{ $rendu->getCommentaire() }}--}}
+                    {{ $rendu->description }}
                     </p>
                 </div>
-{{--                @endif--}}
+               @endif -->
             </div>
             <div>
                 <button onclick="toggleModal('CorrectionModal')" class="w-full bg-white text-black font-black py-5 rounded-2xl uppercase tracking-[0.3em] text-xs hover:bg-cyan-400 transition-all duration-500">
@@ -247,10 +215,7 @@
                 </button>
             </div>
         </div>
-{{--        @endif--}}
-{{--        @endif--}}
-{{--        @endforeach--}}
-{{--        @endforeach--}}
+      @endforeach
     </div>
 </section>
         </main>

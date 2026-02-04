@@ -3,7 +3,9 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FormateurController;
+use App\Http\Controllers\EtudiantController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/login', [AuthController::class, 'show'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -28,6 +30,7 @@ Route::middleware(['auth', 'role:formateur'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:etudiant'])->group(function () {
-    Route::get('/etudiantdash', fn() => view('etudiantdash'))->name('etudiantdash');
+    Route::get('/etudiantdash', [EtudiantController::class, 'index'])->name('etudiantdash');
+    Route::post('/etudiantdash',[EtudiantController::class, 'soummetreRendu'])->name('etudiant.rendu');
 });
 

@@ -10,6 +10,7 @@ use App\Models\Competence;
 use App\Models\Etudiant;
 use App\Models\Sprint;
 use App\Models\User;
+use App\Models\Rendu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,14 +26,14 @@ class FormateurController extends Controller
     public function creer_brief(Request $request)
     {
 
-        $Titre = $request->titre;
-        $DateDebut = $request->date_debut;
-        $DateFin = $request->date_fin;
-        $SprintId = $request->sprint_id;
-        $type = 'type';
-        $CompetenceId = $request->competence_ids;
-        $Description = $request->description;
-        $Formateur_id = $request->formateur_id;
+        $Titre = $request->titre ?? [];
+        $DateDebut = $request->date_debut ?? [];
+        $DateFin = $request->date_fin ?? [];
+        $SprintId = $request->sprint_id ?? [];
+        $type = $request->type ?? [];
+        $CompetenceId = $request->competence_ids ?? [];
+        $Description = $request->description ?? [];
+        $Formateur_id = $request->formateur_id ?? [];
 
         if($this->FormateurService->CreateBrief($Titre,$DateDebut,$DateFin,$SprintId,$type,$CompetenceId,$Description,$Formateur_id)) {
 
@@ -63,11 +64,11 @@ class FormateurController extends Controller
         $classes = Classe::all();
         $sprints = Sprint::all();
         $competences = Competence::all();
-        $briefs = Brief::all();
-        $etudiants = Etudiant::with('user')->get();
-        $rendus = $this->FormateurService->getAllRendu() ?? [];
+        $briefs = Brief::where('formateur_id', Auth::user()->id)->get();
+        $etudiants = Etudiant::with('user', 'classe.formateurs')->get();
+        $rendus = Rendu::all();
         $formateurs = Formateur::with('classes')->where('user_id', Auth::id())->first();
-        
+
         return view('formateurdash',[
             'title' => "Formateur Dashboard",
             'users' => $users,

@@ -48,8 +48,8 @@ return new class extends Migration
 
         Schema::create('formateurs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->unique()->constrained('users')->nullOnDelete();
             $table->string('username');
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
         });
 
         Schema::create('formateurs_classe', function (Blueprint $table) {
@@ -66,10 +66,9 @@ return new class extends Migration
             $table->foreignId('sprint_id')->nullable()->constrained('sprints')->nullOnDelete();
             $table->timestamp('date_debut');
             $table->timestamp('date_fin');
-            $table->foreignId('formateur_id')
-                ->nullable()
-                ->constrained('formateurs')
-                ->nullOnDelete();        });
+            $table->unsignedBigInteger('formateur_id')->nullable();
+            $table->foreign('formateur_id')->references('user_id')->on('formateurs')->onDelete('set null');
+        });
 
         Schema::create('rendu', function (Blueprint $table) {
             $table->id();

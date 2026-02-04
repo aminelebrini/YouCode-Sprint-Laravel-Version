@@ -19,13 +19,25 @@ class Etudiant extends Model
     ];
 
     public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+{
+    return $this->belongsTo(User::class);
+}
 
-    public function classe()
+public function classe()
+{
+    return $this->belongsTo(Classe::class, 'classe_id', 'id');
+}
+
+
+    public function formateur()
     {
-        return $this->belongsTo(Classe::class,'classe_id');
+        return $this->hasOneThrough(
+        Formateur::class, 
+        Classe::class, 
+        'id',          
+        'id',          
+        'classe_id',   
+        'formateur_id');
     }
 
     public function rendus()

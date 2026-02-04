@@ -7,6 +7,7 @@
     use App\Models\Brief;
     use App\Models\Competence;
     use App\Models\Sprint;
+    use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\DB;
 
 
@@ -14,14 +15,22 @@
     {
         public function Create_Brief($Titre,$DateDebut,$DateFin,$SprintId,$type,$CompetenceId,$Description,$Formateur_id)
         {
+            $userId = Formateur::where('user_id', Auth::user()->id)->value('user_id');
+
+            $typeString = '';
+            foreach ($type as $index => $t) {
+                if ($index > 0) $typeString .= ',';
+                $typeString .= (string)$t;
+            }
+
             $brief = Brief::create([
                 'nom' => $Titre,
                 'description' => $Description,
-                'type' => $type,
+                'type' => (string) $typeString,
                 'sprint_id' => $SprintId,
                 'date_debut' => $DateDebut,
                 'date_fin' => $DateFin,
-                'formation_id' => $Formateur_id,
+                'formateur_id' => $userId,
             ]);
 
             if ($brief){
@@ -33,8 +42,10 @@
                     ]);
                 }
             }
+
             //ajout de brief_type
         }
+
         public function Assign_Students($studentId,$classId)
         {
             $fullname = User::where('id', $studentId)->first(['firstname', 'lastname']);
