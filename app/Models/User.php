@@ -58,4 +58,11 @@ class User extends Authenticatable
             'classe_id'
         );
     }
+
+    public function etudiants()
+    {
+        return $this->hasOne(Etudiant::class);
+    }
+
+
 }

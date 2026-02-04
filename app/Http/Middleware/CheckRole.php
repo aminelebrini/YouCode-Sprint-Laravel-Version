@@ -3,19 +3,20 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle($request, Closure $next, $role)
     {
-        // Kan-checkiw l-Session dyalna lli 7etina f l-AuthController
-        if (strtolower(session('user_role')) === strtolower($role)) {
-            return $next($request);
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        // Ila makanch m-connecti, kireddu l-login
-        return redirect()->route('login')->withErrors(['login' => 'Veuillez vous connecter.']);
+        if (strtolower(Auth::user()->role) !== strtolower($role)) {
+            abort(403);
+        }
+
+        return $next($request);
     }
 }

@@ -66,7 +66,10 @@ return new class extends Migration
             $table->foreignId('sprint_id')->nullable()->constrained('sprints')->nullOnDelete();
             $table->timestamp('date_debut');
             $table->timestamp('date_fin');
-        });
+            $table->foreignId('formateur_id')
+                ->nullable()
+                ->constrained('formateurs')
+                ->nullOnDelete();        });
 
         Schema::create('rendu', function (Blueprint $table) {
             $table->id();
@@ -103,6 +106,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('briefs', function (Blueprint $table) {
+            $table->dropForeign(['formateur_id']);
+            $table->dropColumn('formateur_id');
+        });
         Schema::dropIfExists('competence_brief');
         Schema::dropIfExists('competences');
         Schema::dropIfExists('rendu_etudiant');
@@ -114,6 +121,7 @@ return new class extends Migration
         Schema::dropIfExists('sprints');
         Schema::dropIfExists('classes');
         Schema::dropIfExists('users');
+
     }
 
 };

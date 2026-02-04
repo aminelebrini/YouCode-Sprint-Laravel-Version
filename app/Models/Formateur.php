@@ -23,6 +23,6 @@ class Formateur extends Model
 
     public function classes()
     {
-        return $this->belongsToMany(Classe::class, 'formateurs_classe', 'formateur_id', 'classe_id');
+        return $this->belongsToMany(Classe::class, 'formateurs_classe', 'formateur_id', 'classe_id','user_id','id');
     }
 }

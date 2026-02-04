@@ -20,6 +20,11 @@
         {
             return $this->FormateurRepository->Assign_Students($studentId,$classId);
         }
+
+        public function getUsers()
+        {
+            $users = $this->FormateurRepository->getUsers();
+        }
         public function get_Sprints()
         {
             $sprints = $this->FormateurRepository->getSprint();

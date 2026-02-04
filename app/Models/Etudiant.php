@@ -25,7 +25,7 @@ class Etudiant extends Model
 
     public function classe()
     {
-        return $this->belongsTo(Classe::class);
+        return $this->belongsTo(Classe::class,'classe_id');
     }
 
     public function rendus()

@@ -18,6 +18,7 @@ class Brief extends Model
         'sprint_id',
         'date_debut',
         'date_fin',
+        'formateur_id',
     ];
 
     public function sprint()
@@ -27,6 +28,6 @@ class Brief extends Model
 
     public function competences()
     {
-        return $this->belongsToMany(Competence::class, 'competence_brief');
+        return $this->belongsToMany(Competence::class, 'competence_brief', 'brief_id','id');
     }
 }

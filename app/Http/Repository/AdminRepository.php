@@ -11,28 +11,26 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminRepository
 {
-    public function createUser(array $data)
+    public function createUser($nom, $prenom, $role, $email, $password)
     {
         $user = User::create([
-            'firstname' => $data['firstname'],
-            'lastname'  => $data['lastname'],
-            'role'      => $data['role'] ?? 'Etudiant',
-            'email'     => $data['email'],
-            'password'  => Hash::make($data['password']),
+            'firstname' => $nom,
+            'lastname'  => $prenom,
+            'role'      => $role,
+            'email'     => $email,
+            'password'  => Hash::make($password),
         ]);
 
-        if($data['role'] === 'Formateur') {
+        if($user->role === 'formateur') {
             $formateur = Formateur::create([
-                'username' => strtolower($data['firstname'] . $data['lastname']),
+                'username' => strtolower($user->firstname . $user->lastname),
                 'user_id'  => $user->id,
             ]);
         }
-
         return $user;
 
     }
 
-    /* ========== SPRINTS ========== */
     public function createSprint($titre, $dateDebut, $dateFin)
     {
         return Sprint::create([
@@ -47,7 +45,6 @@ class AdminRepository
         return Sprint::all();
     }
 
-    /* ========== CLASSES ========== */
     public function createClasse($nom, $capacity, $anneeScolaire)
     {
         return Classe::create([
@@ -63,7 +60,6 @@ class AdminRepository
         return Classe::all();
     }
 
-    /* ========== COMPETENCES ========== */
     public function addSkill($competenceName)
     {
         return Competence::create([
@@ -77,16 +73,14 @@ class AdminRepository
         return Competence::all();
     }
 
-    /* ========== ASSIGNATION FORMATEUR ========== */
     public function assignerFormateur($classeId, $formateurId)
     {
         return \DB::table('formateurs_classe')->insert([
-            'classe_id'     => $classeId,
             'formateur_id'  => $formateurId,
+            'classe_id'     => $classeId,
         ]);
     }
 
-    /* ========== USERS LIST ========== */
     public function getUsers()
     {
         return User::all();

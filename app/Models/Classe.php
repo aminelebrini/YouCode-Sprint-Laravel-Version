@@ -10,6 +10,7 @@ class Classe extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'nom',
         'nombre',
         'promo',
@@ -33,5 +34,5 @@ class Classe extends Model
             'formateurs_classe',
             'classe_id',
             'formateur_id'
-        )->where('role', 'Formateur');    }
+        )->where('role', 'formateur');    }
 }

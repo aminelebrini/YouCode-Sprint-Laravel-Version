@@ -12,7 +12,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeInUp 0.6s ease-out forwards; }
-        
+
         .glass-card {
             background: rgba(5, 5, 5, 0.8);
             backdrop-filter: blur(16px);
@@ -26,7 +26,7 @@
 <body class="bg-cyan-900 bg-cover bg-center bg-no-repeat min-h-screen font-sans text-white overflow-hidden">
 
     <div class="flex h-screen overflow-hidden">
-        
+
         <aside class="w-72 glass-card m-4 rounded-[2rem] hidden md:flex flex-col p-6 animate-fade-in">
             <header class="text-center mb-12">
                 <h1 class="text-white text-2xl font-black italic uppercase tracking-tighter">
@@ -56,51 +56,53 @@
             </nav>
 
             <div class="mt-auto pt-6 border-t border-white/5">
-                <form action="/logout" method="POST">
-                    <button class="w-full flex items-center space-x-4 text-red-400/60 hover:text-red-400 px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all">
+                    <a href="/logout" class="w-full flex items-center space-x-4 text-red-400/60 hover:text-red-400 px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all">
                         <i class="fas fa-power-off"></i>
                         <span>Déconnexion</span>
-                    </button>
-                </form>
+                    </a>
             </div>
         </aside>
 
         <main class="flex-1 p-4 md:p-8 overflow-y-auto">
-            
+
             <div class="glass-card rounded-[1.5rem] p-4 mb-8 flex justify-between items-center px-8 animate-fade-in">
                 <div class="flex flex-col">
                     <span class="text-[10px] text-cyan-400 font-black uppercase tracking-[0.3em]">Session Active</span>
-                    @foreach($etudiants as $etudiant)
-                    @foreach($classes as $classe)
-                    @if($classe->getFormateurId() === $etudiant->getFormateurId())
-                    <h2 class="text-white font-black uppercase tracking-widest text-sm italic">{{ $classe->getNom() }}</h2>
+                    @if($formateurs && $formateurs->classes->isNotEmpty())
+                        @foreach($formateurs->classes as $classe)
+                            <h2>{{ $classe->nom }}</h2>
+                        @endforeach
+                    @else
+                        <p>Aucune classe assignée.</p>
                     @endif
-                    @endforeach
-                    @endforeach
+
                 </div>
                 <div class="flex items-center space-x-4 border-l border-white/10 pl-6">
                     <div class="text-right">
                         <p class="text-[10px] text-white/40 uppercase font-bold tracking-widest">Formateur</p>
-                        @foreach($users as $user)
-                        @if($user->getId() === $_SESSION['id'])
-                            <p class="text-xs font-black text-white uppercase italic">{{ $user->getFirstname() . " " . $user->getLastname() }}</p>
+                            <p class="text-xs font-black text-white uppercase italic">{{ auth()->user()->firstname }} {{ auth()->user()->lastname }}</p>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 p-0.5 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-                        <img src="https://ui-avatars.com/api/?name={{ $user->getFirstname() . ' ' . $user->getLastname() }}&background=000&color=fff" class="rounded-lg" alt="avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ auth()->user()->firstname }} . {{ auth()->user()->lastname }}&background=000&color=fff" class="rounded-lg" alt="avatar">
                     </div>
-                    @endif
-                    @endforeach
                 </div>
             </div>
-
+            @foreach($classes as $classe)
+    <p>ID: {{ $classe->id }}</p>
+    <p>Nom: {{ $classe->nom }}</p>
+    <p>Nombre d'étudiants: {{ $classe->nombre }}</p>
+    <p>Promo: {{ $classe->promo }}</p>
+    <p>Taux: {{ $classe->taux }}%</p>
+    <hr>
+    @endforeach
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
                 <div class="glass-card p-6 rounded-[2rem] border-l-4 border-l-cyan-400">
                     <p class="text-white/40 text-[9px] uppercase font-black tracking-widest mb-1">Briefs Lancés</p>
-                    <h3 class="text-2xl font-black italic">12</h3>
+                    <h3 class="text-2xl font-black italic">{{ count($briefs) }}</h3>
                 </div>
                 <div class="glass-card p-6 rounded-[2rem] border-l-4 border-l-purple-500">
                     <p class="text-white/40 text-[9px] uppercase font-black tracking-widest mb-1">Apprenants</p>
-                    <h3 class="text-2xl font-black italic">24</h3>
+                    <h3 class="text-2xl font-black italic">{{ count($etudiants) }}</h3>
                 </div>
                 <div class="glass-card p-6 rounded-[2rem] border-l-4 border-l-yellow-500">
                     <p class="text-white/40 text-[9px] uppercase font-black tracking-widest mb-1">Rendus en attente</p>
@@ -111,7 +113,6 @@
                     <h3 class="text-2xl font-black italic">85%</h3>
                 </div>
             </div>
-
             <section class="mb-8 animate-fade-in" style="animation-delay: 0.2s;">
                 <div class="flex justify-between items-center mb-6 px-4">
                     <h2 class="text-cyan-400 font-black uppercase tracking-[0.3em] text-lg italic"><i class="fas fa-file-invoice mr-3"></i>Briefs Récents</h2>
@@ -119,46 +120,32 @@
                         <i class="fas fa-paper-plane"></i> Nouveau Brief
                     </button>
                 </div>
-                @foreach($briefs as $brief)
-                @if($brief->getFormateurId() === $_SESSION['id'])
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">     
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    @foreach($briefs as $brief)
                     <div class="glass-card p-8 rounded-[2.5rem] group hover:border-cyan-400/50 transition-all duration-500 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-6">
-                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-[8px] font-black uppercase tracking-widest border border-green-500/20">
-                        Actif
-                    </span>
-                </div>
-                <h4 class="text-xl font-black text-white uppercase mb-3 group-hover:text-cyan-400 transition-colors italic">
-                    {{ $brief->getTitre() }}
-                </h4>
-                <div class="space-y-2 text-[11px] text-white/70">
-                    <p>
-                        <span class="text-cyan-400 font-bold">Type :</span>
-                        {{ $brief->getType() }}
-                    </p>
-                    <p>
-                        <span class="text-cyan-400 font-bold">Début :</span>
-                        {{ $brief->getDateDebut() }}
-                        <span class="mx-1">→</span>
-                     <span class="text-cyan-400 font-bold">Fin :</span>
-                        {{ $brief->getDateFin() }}
-                    </p>
-                </div>
-
-                <div class="flex items-center justify-between pt-6 mt-6 border-t border-white/5">
-                    <div class="flex flex-wrap gap-2">
-                        <div class="px-3 py-1 rounded-full bg-cyan-400/10 text-cyan-300 text-[9px] font-black uppercase tracking-widest border border-cyan-400/20">
-                            {{ $brief->getCompetence()}}
+                        <div class="absolute top-0 right-0 p-6">
+                            <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-[8px] font-black uppercase tracking-widest border border-green-500/20">
+                                Actif
+                            </span>
+                        </div>
+                        <h4 class="text-xl font-black text-white uppercase mb-3 group-hover:text-cyan-400 transition-colors italic">
+                            {{ $brief->nom }}
+                        </h4>
+                        <div class="space-y-2 text-[11px] text-white/70">
+                            <p><span class="text-cyan-400 font-bold">Type :</span> {{ $brief->type }}</p>
+                            <p><span class="text-cyan-400 font-bold">Début :</span> {{ $brief->date_debut }} <span class="mx-1">→</span> <span class="text-cyan-400 font-bold">Fin :</span> {{ $brief->date_fin }}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-6 mt-6 border-t border-white/5">
+                            <div class="flex flex-wrap gap-2">
+                                <div class="px-3 py-1 rounded-full bg-cyan-400/10 text-cyan-300 text-[9px] font-black uppercase tracking-widest border border-cyan-400/20">Active</div>
+                            </div>
                         </div>
                     </div>
+                    @endforeach
                 </div>
-            </div>
-        </div>
-        @endif
-        @endforeach
         </section>
             <section id="students-list" class="animate-fade-in mt-12">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 px-4">
         <h2 class="text-cyan-400 font-black uppercase tracking-[0.3em] text-xl italic">
             <i class="fas fa-user-graduate mr-3"></i>Promotion Active
         </h2>
@@ -166,7 +153,6 @@
             <i class="fas fa-user-plus"></i> Assigner Apprenants
         </button>
     </div>
-
     <div class="glass-card rounded-[2.5rem] overflow-hidden border border-white/5">
         <table class="w-full text-left">
             <thead>
@@ -178,32 +164,31 @@
                 </tr>
             </thead>
             <tbody class="text-sm">
-                @foreach($etudiants as $etudiant)
-                    @if($etudiant->getFormateurId() === $_SESSION['id'])
+               @foreach($etudiants as $etudiant)
                     <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
                     <td class="p-8">
                         <div class="flex items-center gap-4">
-                            <p class="font-black text-white uppercase tracking-tight italic">{{ $etudiant->getFirstname() . " " . $etudiant->getLastname() }}</p>
+                            <p class="font-black text-white uppercase tracking-tight italic">{{ $etudiant->user->firstname . " " . $etudiant->user->firstname }}</p>
                         </div>
                     </td>
                     <td class="p-8 text-white/40">
                         <div class="flex items-center gap-2">
                              <span class="px-3 py-1 bg-cyan-400/10 text-cyan-400 border border-cyan-400/20 rounded-lg text-[9px] font-black uppercase tracking-[0.2em]">
+                                {{ $etudiant->level }}
                             </span>
                         </div>
                     </td>
                     <td class="p-8">
                         <div class="flex items-center gap-4">
-                            <p class="font-black text-white uppercase tracking-tight italic">{{ $etudiant->getEmail() }}</p>
+                            <p class="font-black text-white uppercase tracking-tight italic">{{ $etudiant->user->email }}</p>
                         </div>
                     </td>
                     <td class="p-8">
                         <div class="flex items-center gap-4">
-                            <p class="font-black text-white tracking-tight italic">{{ $etudiant->getUsername() }}</p>
+                            <p class="font-black text-white tracking-tight italic">{{ $etudiant->username }}</p>
                         </div>
                     </td>
                 </tr>
-                @endif
                 @endforeach
             </tbody>
                     </table>
@@ -211,23 +196,23 @@
             </section>
             <section class="mb-8 animate-fade-in" style="animation-delay: 0.4s;">
                 <div class="mb-6 px-4 flex justify-between items-center">
-                    
+
                     <h2 class="text-cyan-400 font-black uppercase tracking-[0.3em] text-lg italic">
                         <i class="fas fa-history mr-3"></i>Historique des Rendus
                     </h2>
                 </div>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        @foreach($rendus as $rendu)
-        @foreach($competences as $competence)
-        @if($rendu->getFormateurId() === $_SESSION['id'])
-        @if(in_array($competence->getId(), $rendu->getCompetenceId()))
+{{--        @foreach($rendus as $rendu)--}}
+{{--        @foreach($competences as $competence)--}}
+{{--        @if($rendu->getFormateurId() === $_SESSION['id'])--}}
+{{--        @if(in_array($competence->getId(), $rendu->getCompetenceId()))--}}
         <div class="glass-card p-6 rounded-[2rem] border-t-2 border-cyan-400/30 hover:border-cyan-400 transition-all duration-300">
             <div class="flex justify-between items-center mb-4">
                 <div class="w-10 h-10 rounded-xl bg-cyan-400/10 flex items-center justify-center text-cyan-400 border border-cyan-400/20">
                     <i class="fab fa-github text-xl"></i>
                 </div>
                 <h3 class="text-[10px] text-cyan-400 font-black uppercase tracking-[0.2em] italic">
-                    {{ $rendu->getFullName() }}
+{{--                    {{ $rendu->getFullName() }}--}}
                 </h3>
                 <span class="px-3 py-1 bg-cyan-400/10 text-cyan-400 rounded-full text-[8px] font-black uppercase tracking-widest border border-cyan-400/20">
                     Envoyé
@@ -235,26 +220,26 @@
             </div>
 
             <h4 class="text-white font-black uppercase text-sm mb-1 italic truncate">
-                {{ $rendu->getBriefName() }}
+{{--                {{ $rendu->getBriefName() }}--}}
             </h4>
             <p class="text-[9px] text-white/40 font-bold uppercase tracking-widest mb-4">
-                Soumis le : <span class="text-white/60">{{ $rendu->getDateSoumission() }}</span>
+{{--                Soumis le : <span class="text-white/60">{{ $rendu->getDateSoumission() }}</span>--}}
             </p>
 
             <div class="space-y-3">
-                <a href="{{ $rendu->getLink() }}" target="_blank" class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all group">
+                <a href="" target="_blank" class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all group">
                     <span class="text-[10px] font-bold text-white/60 group-hover:text-cyan-400 uppercase italic">Voir le code</span>
                     <i class="fas fa-external-link-alt text-[10px] text-white/20 group-hover:text-cyan-400"></i>
                 </a>
-                
-                @if($rendu->getCommentaire())
+
+{{--                @if($rendu->getCommentaire())--}}
                 <div class="p-3 bg-black/20 rounded-xl border border-white/5">
                     <p class="text-[15px] text-white italic leading-relaxed">
                         <i class="fas fa-quote-left mr-1 opacity-30"></i>
-                        {{ $rendu->getCommentaire() }}
+{{--                        {{ $rendu->getCommentaire() }}--}}
                     </p>
                 </div>
-                @endif
+{{--                @endif--}}
             </div>
             <div>
                 <button onclick="toggleModal('CorrectionModal')" class="w-full bg-white text-black font-black py-5 rounded-2xl uppercase tracking-[0.3em] text-xs hover:bg-cyan-400 transition-all duration-500">
@@ -262,23 +247,23 @@
                 </button>
             </div>
         </div>
-        @endif
-        @endif
-        @endforeach
-        @endforeach
+{{--        @endif--}}
+{{--        @endif--}}
+{{--        @endforeach--}}
+{{--        @endforeach--}}
     </div>
 </section>
         </main>
     </div>
-
     <div id="BriefModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-2xl p-10 rounded-[2.5rem] border border-cyan-400/30 animate-fade-in shadow-[0_0_50px_rgba(34,211,238,0.1)] max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="text-white text-2xl font-black italic uppercase tracking-tighter">Lancer <span class="text-cyan-400">Nouveau Brief</span></h3>
                 <button onclick="toggleModal('BriefModal')" class="text-white/20 hover:text-white transition-all"><i class="fas fa-times text-xl"></i></button>
             </div>
-            
-            <form class="space-y-6 text-left" action="/creer_brief" method="POST">
+
+            <form class="space-y-6 text-left" action="{{ route('formateur.createBrief') }}" method="POST">
+                @csrf
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2 italic">Titre du Projet</label>
@@ -300,8 +285,8 @@
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-5 text-white outline-none focus:border-cyan-400/50 appearance-none cursor-pointer">
                         <option value="" class="bg-zinc-900">Choisir une le Sprint...</option>
                         @foreach($sprints as $sprint)
-                            <option value="{{ $sprint->getId() }}" class="bg-zinc-900">
-                                {{ $sprint->getTitre() }}
+                            <option value="{{ $sprint->id }}" class="bg-zinc-900">
+                            {{ $sprint->nom }}
                             </option>
                         @endforeach
                     </select>
@@ -344,9 +329,9 @@
                         </label>
 
                         <label class="flex items-center gap-3 cursor-pointer bg-white/5 p-3 rounded-xl border border-white/10 hover:border-cyan-400/40">
-                         <input type="checkbox" name="type[]" value="PostgreSQL" class="accent-cyan-400">
-                            <span class="text-white text-sm">Postgre SQL</span>
-                     </label>
+                            <input type="checkbox" name="type[]" value="PostgreSQL" class="accent-cyan-400">
+                                <span class="text-white text-sm">Postgre SQL</span>
+                        </label>
 
                         <label class="flex items-center gap-3 cursor-pointer bg-white/5 p-3 rounded-xl border border-white/10 hover:border-cyan-400/40">
                          <input type="checkbox" name="type[]" value="Docker" class="accent-cyan-400">
@@ -380,15 +365,15 @@
                     <div class="grid grid-cols-2 gap-3">
                         @foreach($competences as $competence)
                             <label class="flex items-center gap-3 cursor-pointer bg-white/5 p-3 rounded-xl border border-white/10 hover:border-cyan-400/40">
-                                <input type="checkbox" name="competence_ids[]" value="{{ $competence->getId() }}" class="accent-cyan-400">
+                                <input type="checkbox" name="competence_ids[]" value="{{ $competence->id }}" class="accent-cyan-400">
                                 <span class="text-white text-sm">
-                                    {{ $competence->getNom() }}
+                                    {{ $competence->nom }}
                                 </span>
                             </label>
                         @endforeach
                     </div>
                 </div>
-                <input type="hidden" name="formateur_id" value="{{ $_SESSION['id'] }}">
+                <input type="hidden" name="formateur_id" value=" ">
                 <div class="space-y-2">
                     <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2 italic">Description & Consignes</label>
                     <textarea rows="4" name="description" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white outline-none focus:border-cyan-400/50 transition-all"></textarea>
@@ -403,7 +388,7 @@
 
     <div id="AssignStudentModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
     <div class="glass-card w-full max-w-lg p-10 rounded-[2.5rem] border-cyan-400/30 animate-fade-in shadow-[0_0_50px_rgba(34,211,238,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
-        
+
         <div class="flex justify-between items-center mb-6 flex-shrink-0">
             <h3 class="text-white text-2xl font-black italic uppercase tracking-tighter">
                 Assignation <span class="text-cyan-400">Globale</span>
@@ -413,19 +398,20 @@
             </button>
         </div>
 
-        <form action="/assign_students" method="POST" class="flex flex-col flex-1 overflow-hidden">
+        <form action="{{ route('formateur.assign_students') }}" method="POST" class="flex flex-col flex-1 overflow-hidden">
+            @csrf
             <div class="pt-4 border-t border-white/5">
                 <label class="text-cyan-400/60 text-[10px] font-black uppercase tracking-[0.3em] mb-2 block ml-2">
                     <i class="fas fa-users mr-2"></i> Choisir l'Étudiant
                 </label>
-                <select name="student_id" required
-                        class="w-full p-3 rounded-[1.5rem] bg-white/[0.03] border border-white/5 text-white text-sm font-black uppercase tracking-tighter italic focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                    @foreach($etudiants as $etudiant)
-                        @if(empty($etudiant->getFormateurId()))
-                            <option value="{{ $etudiant->getId() }}">
-                                {{ $etudiant->getFirstname() }} {{ $etudiant->getLastname() }}
-                            </option>
-                        @endif
+                <select name="student_id" required class="w-full p-3 rounded-[1.5rem] bg-white/[0.03] border border-white/5 text-white text-sm font-black uppercase tracking-tighter italic focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                    <option value="">
+                        SELECTIONNER UN ETUDIANT
+                    </option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">
+                            {{ $user->firstname . " " . $user->lastname }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -435,17 +421,17 @@
                     <i class="fas fa-chalkboard mr-2"></i> Choisir la Classe
                 </label>
                 <select name="classes_id" required
-                        class="w-full p-3 rounded-[1.5rem] bg-white/[0.03] border border-white/5 text-white text-sm font-black uppercase tracking-tighter italic focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                        @foreach($classes as $classe)
-                        @if($classe->getFormateurId() === $_SESSION['id'])
-                            <option value="{{ $classe->getId() }}">
-                                {{ $classe->getNom() }}
-                            </option>
-                        @endif
-                        @endforeach
+                    class="w-full p-3 rounded-[1.5rem] bg-white/[0.03] border border-white/5 text-white text-sm font-black uppercase tracking-tighter italic focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                    <option value="">
+                        SELECTIONNER UNE CLASSE
+                    </option>
+                    @foreach($classes as $classe)
+                        <option value="{{ $classe->id }}">
+                            {{ $classe->nom }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
-
             <div class="pt-6 flex-shrink-0">
                 <button type="submit" class="w-full bg-white text-black font-black py-4 rounded-2xl uppercase tracking-[0.3em] text-[10px] hover:bg-cyan-400 transition-all duration-500 shadow-[0_10px_30px_rgba(255,255,255,0.05)]">
                     Confirmer l'intégration
@@ -492,53 +478,53 @@
                 </label>
 
                 <div class="space-y-4">
-                    @foreach($rendus as $rendu)
-                        @foreach($competences as $competence)
-                            @if(in_array($competence->getId(), $rendu->getCompetenceId()))
-                                <div class="flex flex-col md:flex-row md:items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all group">
+{{--                    @foreach($rendus as $rendu)--}}
+{{--                        @foreach($competences as $competence)--}}
+{{--                            @if(in_array($competence->getId(), $rendu->getCompetenceId()))--}}
+{{--                                <div class="flex flex-col md:flex-row md:items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all group">--}}
 
-                                    <div class="flex items-center gap-4 mb-4 md:mb-0">
-                                        <div class="relative flex items-center">
-                                            <input type="checkbox" name="competence_ids[]"
-                                                   value="{{ $competence->getId() }}"
-                                                   class="peer w-6 h-6 opacity-0 absolute cursor-pointer z-10">
-                                            <div class="w-6 h-6 border-2 border-white/10 rounded-lg peer-checked:bg-cyan-400 peer-checked:border-cyan-400 transition-all flex items-center justify-center">
-                                                <i class="fas fa-check text-[10px] text-black opacity-0 peer-checked:opacity-100"></i>
-                                            </div>
-                                        </div>
+{{--                                    <div class="flex items-center gap-4 mb-4 md:mb-0">--}}
+{{--                                        <div class="relative flex items-center">--}}
+{{--                                            <input type="checkbox" name="competence_ids[]"--}}
+{{--                                                   value="{{ $competence->getId() }}"--}}
+{{--                                                   class="peer w-6 h-6 opacity-0 absolute cursor-pointer z-10">--}}
+{{--                                            <div class="w-6 h-6 border-2 border-white/10 rounded-lg peer-checked:bg-cyan-400 peer-checked:border-cyan-400 transition-all flex items-center justify-center">--}}
+{{--                                                <i class="fas fa-check text-[10px] text-black opacity-0 peer-checked:opacity-100"></i>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <span class="text-sm font-bold text-white/80 uppercase italic tracking-tight group-hover:text-white">
-                                            {{ $competence->getNom() }}
-                                        </span>
-                                    </div>
+{{--                                        <span class="text-sm font-bold text-white/80 uppercase italic tracking-tight group-hover:text-white">--}}
+{{--                                            {{ $competence->getNom() }}--}}
+{{--                                        </span>--}}
+{{--                                    </div>--}}
 
-                                    <div class="flex items-center gap-2">
-                                        @foreach(['IMMITER', 'ADAPTER', 'TRANSPOSER'] as $niveau)
-                                            <label class="cursor-pointer">
-                                                <input type="radio"
-                                                       name="niveau_{{ $competence->getId() }}"
-                                                       value="{{ $niveau }}"
-                                                       class="peer hidden" required>
-                                                <span class="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-[10px] font-black text-white/20 uppercase italic transition-all
-                                                             peer-checked:bg-cyan-400 peer-checked:text-black
-                                                             peer-checked:shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-                                                    {{ $niveau }}
-                                                </span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
-                    @endforeach
+{{--                                    <div class="flex items-center gap-2">--}}
+{{--                                        @foreach(['IMMITER', 'ADAPTER', 'TRANSPOSER'] as $niveau)--}}
+{{--                                            <label class="cursor-pointer">--}}
+{{--                                                <input type="radio"--}}
+{{--                                                       name="niveau_{{ $competence->getId() }}"--}}
+{{--                                                       value="{{ $niveau }}"--}}
+{{--                                                       class="peer hidden" required>--}}
+{{--                                                <span class="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-[10px] font-black text-white/20 uppercase italic transition-all--}}
+{{--                                                             peer-checked:bg-cyan-400 peer-checked:text-black--}}
+{{--                                                             peer-checked:shadow-[0_0_15px_rgba(34,211,238,0.3)]">--}}
+{{--                                                    {{ $niveau }}--}}
+{{--                                                </span>--}}
+{{--                                            </label>--}}
+{{--                                        @endforeach--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            @endif--}}
+{{--                        @endforeach--}}
+{{--                    @endforeach--}}
                 </div>
             </div>
 
             <div class="pt-6">
                 <button type="submit"
                         class="w-full bg-cyan-400 text-black font-black py-6 rounded-[2rem]
-                               uppercase tracking-[0.4em] text-xs hover:bg-white transition-all
-                               shadow-[0_0_30px_rgba(34,211,238,0.2)]">
+                            uppercase tracking-[0.4em] text-xs hover:bg-white transition-all
+                            shadow-[0_0_30px_rgba(34,211,238,0.2)]">
                     Valider l'Évaluation
                 </button>
             </div>

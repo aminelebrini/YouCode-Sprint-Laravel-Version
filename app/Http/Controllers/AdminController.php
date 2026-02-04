@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classe;
+use App\Models\Formateur;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Services\AdminService;
@@ -18,13 +19,6 @@ class AdminController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'nom'      => 'required|string',
-            'prenom'   => 'required|string',
-            'role'     => 'required|string',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-        ]);
 
         $this->adminService->createUser(
             $request->nom,
@@ -104,6 +98,7 @@ class AdminController extends Controller
     {
 
         return view('admindash', [
+            'formateurs' => Formateur::all(),
             'sprints'     => $this->adminService->getSprints(),
             'users'       => $this->adminService->getUsers(),
             'classes'     => Classe::with('formateurs')->get(),

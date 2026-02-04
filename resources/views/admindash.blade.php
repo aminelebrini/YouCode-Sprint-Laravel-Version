@@ -314,8 +314,8 @@
             <div class="space-y-2">
                 <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2">Rôle</label>
                 <select name="role" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white outline-none focus:border-cyan-400/50 transition-all appearance-none">
-                    <option value="Etudiant" class="bg-zinc-900">Etudiant</option>
-                    <option value="Formateur" class="bg-zinc-900">Formateur</option>
+                    <option value="etudiant" class="bg-zinc-900">Etudiant</option>
+                    <option value="formateur" class="bg-zinc-900">Formateur</option>
                 </select>
             </div>
             <div class="space-y-2 text-left">
@@ -324,7 +324,7 @@
             </div>
 
             <div class="space-y-2 text-left">
-                <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2">Email YouCode</label>
+                <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2">Password</label>
                 <input name="password" type="password" placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white outline-none focus:border-cyan-400/50 transition-all">
             </div>
             <button type="submit" class="w-full bg-white text-black font-black py-4 rounded-2xl uppercase tracking-[0.2em] text-xs hover:bg-cyan-400 transition-all">Enregistrer</button>
@@ -466,7 +466,7 @@
                         <option value="" class="bg-zinc-900">Choisir un formateur...</option>
 
                         @foreach($users as $user)
-                            @if($user->role === 'Formateur')
+                            @if($user->role === 'formateur')
                                 <option value="{{ $user->id }}" class="bg-zinc-900 uppercase">
                                     {{ $user->firstname }} {{ $user->lastname }}
                                 </option>

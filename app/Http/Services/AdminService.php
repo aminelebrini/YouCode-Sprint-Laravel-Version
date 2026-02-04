@@ -17,13 +17,7 @@ class AdminService
     /* ========== USERS ========== */
     public function createUser($nom, $prenom, $role, $email, $password)
     {
-        return $this->adminRepository->createUser([
-            'firstname' => $nom,
-            'lastname'  => $prenom,
-            'role'      => $role,
-            'email'     => $email,
-            'password'  => Hash::make($password),
-        ]);
+        return $this->adminRepository->createUser($nom, $prenom, $role, $email, $password);
     }
 
     /* ========== CLASSES ========== */

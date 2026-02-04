@@ -18,8 +18,8 @@ class AuthService
         return $this->AuthRepository->login($email, $password);
     }
 
-    public function logout()
-    {
-        session()->flush();
-    }
+//    public function logout()
+//    {
+//        session()->flush();
+//    }
 }
