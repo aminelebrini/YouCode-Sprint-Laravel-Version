@@ -55,18 +55,45 @@ class FormateurController extends Controller
                     ->with('success', 'Assignement créé avec succès');
             }
     }
+
+    public function CorrectionRendu(Request $request)
+    {
+        $renduId = $request->rendu_id;
+        $etudiantId = $request->etudiant_id;
+        $briefId = $request->brief_id;
+        $commentaire = $request->commentaire;
+        $competenceId = $request->competences;
+        $levels = $request->levels;
+
+        if($this->FormateurService->CorrectionRendu($renduId,$briefId,$etudiantId,$commentaire,$competenceId,$levels))
+        {
+            return redirect()->route('formateurdash')->with('success', 'Évaluation enregistrée avec succès !');
+        }
+    }
     public function index()
     {
-        $users = User::where('role', 'etudiant')->whereDoesntHave('etudiants', function($q){
+        $users = User::where('role', 'etudiant')->whereDoesntHave('etudiant', function($q){
         $q->whereNotNull('classe_id');
         })->get();
+
+        $formateurId = Auth::user()->id;
 
         $classes = Classe::all();
         $sprints = Sprint::all();
         $competences = Competence::all();
+        $competences_brief = Rendu::whereHas('briefs', function($q) {
+        $q->where('formateur_id', Auth::user()->id);
+    })
+    ->with(['etudiants.user', 'briefs.competences'])
+    ->orderBy('id', 'desc')
+    ->get(); 
         $briefs = Brief::where('formateur_id', Auth::user()->id)->get();
         $etudiants = Etudiant::with('user', 'classe.formateurs')->get();
-        $rendus = Rendu::all();
+        $rendus = Rendu::whereHas('briefs', function($query) use ($formateurId) {
+        $query->where('formateur_id', $formateurId);
+        })->with(['etudiants.user', 'briefs.competences']) 
+        ->orderBy('id', 'desc')
+        ->get();
         $formateurs = Formateur::with('classes')->where('user_id', Auth::id())->first();
 
         return view('formateurdash',[
@@ -75,6 +102,7 @@ class FormateurController extends Controller
             'classes' => $classes,
             'sprints' => $sprints,
             'competences' => $competences,
+            'competences_brief' => $competences_brief,
             'briefs' => $briefs,
             'etudiants' => $etudiants,
             'rendus' => $rendus,

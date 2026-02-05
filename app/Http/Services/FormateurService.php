@@ -21,6 +21,11 @@
             return $this->FormateurRepository->Assign_Students($studentId,$classId);
         }
 
+        public function CorrectionRendu($renduId,$briefId,$etudiantId,$commentaire,$competenceId,$levels)
+        {
+            return $this->FormateurRepository->CorrectionRendu($renduId,$briefId,$etudiantId,$commentaire,$competenceId,$levels);
+        }
+
         public function getUsers()
         {
             $users = $this->FormateurRepository->getUsers();

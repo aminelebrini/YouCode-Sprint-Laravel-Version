@@ -137,7 +137,15 @@
                 @csrf
                 <input type="hidden" name="brief_id" id="rendu_brief_id">
                 <input type="hidden" name="etudiant_id" value="{{ auth()->user()->id }}">
-                
+               
+                <div class="space-y-2">
+                    <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2 italic block text-left">Titre du Projet</label>
+                    <div class="relative">
+                        <i class="fab fa-title absolute left-5 top-1/2 -translate-y-1/2 text-white/20"></i>
+                        <input type="text" name="Titrerendu" required placeholder="Simplon" 
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-5 text-white outline-none focus:border-cyan-400/50 transition-all">
+                    </div>
+                </div>
                 <div class="space-y-2">
                     <label class="text-cyan-400/60 text-[9px] font-black uppercase tracking-widest ml-2 italic block text-left">Lien du Repository (GitHub / Vercel)</label>
                     <div class="relative">
@@ -163,6 +171,7 @@
         <div class="glass-card w-full max-w-4xl rounded-[3rem] border-cyan-400/30 animate-fade-in flex flex-col max-h-[90vh] overflow-hidden">
             <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
                 <h3 id="modalTitle" class="text-2xl font-black italic uppercase text-cyan-400"></h3>
+                
                 <button onclick="toggleModal('ContenuModal')" class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-red-500/20 transition-all border border-white/5">
                     <i class="fas fa-times text-xl"></i>
                 </button>

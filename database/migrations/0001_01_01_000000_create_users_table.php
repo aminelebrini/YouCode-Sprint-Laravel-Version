@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
@@ -33,15 +30,16 @@ return new class extends Migration
         Schema::create('sprints', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
-            $table->timestamp('date_debut');
-            $table->timestamp('date_fin');
+            $table->timestamp('date_debut')->nullable();
+            $table->timestamp('date_fin')->nullable();
             $table->foreignId('classe_id')->nullable()->constrained('classes')->nullOnDelete();
         });
 
         Schema::create('etudiants', function (Blueprint $table) {
             $table->id();
             $table->string('username');
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            // FIX 1: Zid unique() hna bach evaluations tqder t-referenciha
+            $table->foreignId('user_id')->unique()->nullable()->constrained('users')->nullOnDelete();
             $table->integer('level')->nullable();
             $table->foreignId('classe_id')->nullable()->constrained('classes')->nullOnDelete();
         });
@@ -64,8 +62,8 @@ return new class extends Migration
             $table->text('description');
             $table->string('type');
             $table->foreignId('sprint_id')->nullable()->constrained('sprints')->nullOnDelete();
-            $table->timestamp('date_debut');
-            $table->timestamp('date_fin');
+            $table->timestamp('date_debut')->nullable();
+            $table->timestamp('date_fin')->nullable();
             $table->unsignedBigInteger('formateur_id')->nullable();
             $table->foreign('formateur_id')->references('user_id')->on('formateurs')->onDelete('set null');
         });
@@ -75,7 +73,7 @@ return new class extends Migration
             $table->text('text');
             $table->text('description');
             $table->string('link');
-            $table->timestamp('date_soumission');
+            $table->timestamp('date_soumission')->nullable();
         });
 
         Schema::create('rendu_etudiant', function (Blueprint $table) {
@@ -88,27 +86,43 @@ return new class extends Migration
         Schema::create('competences', function (Blueprint $table) {
             $table->id();
             $table->text('nom');
-            $table->timestamp('created_at');
+            $table->timestamps();
         });
 
         Schema::create('competence_brief', function (Blueprint $table) {
             $table->id();
             $table->foreignId('brief_id')->nullable()->constrained('briefs')->nullOnDelete();
             $table->foreignId('competence_id')->nullable()->constrained('competences')->nullOnDelete();
-            $table->timestamp('created_at');
+            $table->timestamps();
         });
 
+        Schema::create('evaluations', function (Blueprint $table) {
+            $table->id();
+            $table->text('commentaire')->nullable();
+            $table->enum('niveau_maitrise', ['IMITER', 'ADAPTER', 'TRANSPOSER']);
+            
+            $table->foreignId('etudiant_id')
+                  ->constrained('etudiants', 'user_id')
+                  ->onDelete('cascade');
+
+            $table->foreignId('formateur_id')
+                  ->constrained('formateurs', 'user_id')
+                  ->onDelete('cascade');
+
+            $table->foreignId('brief_id')
+                  ->constrained('briefs')
+                  ->onDelete('cascade');
+
+            $table->foreignId('competence_id')
+                  ->constrained('competences')
+                  ->onDelete('cascade');
+            $table->timestamps(); 
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('briefs', function (Blueprint $table) {
-            $table->dropForeign(['formateur_id']);
-            $table->dropColumn('formateur_id');
-        });
+        Schema::dropIfExists('evaluations');
         Schema::dropIfExists('competence_brief');
         Schema::dropIfExists('competences');
         Schema::dropIfExists('rendu_etudiant');
@@ -120,7 +134,5 @@ return new class extends Migration
         Schema::dropIfExists('sprints');
         Schema::dropIfExists('classes');
         Schema::dropIfExists('users');
-
     }
-
 };

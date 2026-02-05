@@ -6,6 +6,7 @@
     use App\Models\Formateur;
     use App\Models\Brief;
     use App\Models\Competence;
+    use App\Models\Evaluation;
     use App\Models\Sprint;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\DB;
@@ -58,6 +59,23 @@
             ]);
         }
 
+        public function CorrectionRendu($renduId,$briefId,$etudiantId,$commentaire,$competenceId,$levels)
+        {
+            $typeString = '';
+            foreach ($competenceId as $index => $c) {
+                if ($index > 0) $typeString .= ',';
+                $typeString .= (string)$c;
+            }
+            // dd($typeString);
+            Evaluation::create([
+                'commentaire' => $commentaire,
+                'niveau_maitrise' => $levels,
+                'etudiant_id' => $etudiantId,
+                'formateur_id'=> Auth::user()->id,
+                'brief_id' => $briefId,
+                'competence_id' => $typeString
+            ]);
+        }
         public function getUsers()
         {
             etudiant::all();

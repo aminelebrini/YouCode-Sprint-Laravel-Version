@@ -27,6 +27,7 @@ Route::middleware(['auth', 'role:formateur'])->group(function () {
     Route::get('/formateurdash', [FormateurController::class, 'index'])->name('formateurdash');
     Route::post('/formateurdash/brief',[FormateurController::class, 'creer_brief'])->name('formateur.createBrief');
     Route::post('/formateurdash/assignement', [FormateurController::class, 'assign_students'])->name('formateur.assign_students');
+    Route::post('/admindash/correction', [FormateurController::class, 'CorrectionRendu'])->name('formateur.correction');
 });
 
 Route::middleware(['auth', 'role:etudiant'])->group(function () {
