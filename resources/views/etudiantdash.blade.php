@@ -120,9 +120,88 @@
                     @endforelse
                 </div>
             </section>
-        </main>
+
+            <section class="mt-12 mb-8 animate-fade-in">
+    <div class="mb-6 px-4">
+        <h2 class="text-cyan-400 font-black uppercase tracking-[0.3em] text-lg italic">
+            <i class="fas fa-clipboard-check mr-3"></i>Mes Corrections
+        </h2>
     </div>
 
+    <div class="glass-card rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl">
+        <div class="overflow-x-auto shadow-[inset_0_0_20px_rgba(34,211,238,0.05)]">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="text-cyan-400/60 text-[10px] uppercase tracking-[0.2em] border-b border-white/5 bg-white/[0.02]">
+                        <th class="p-6 font-black italic">Brief</th>
+                        <th class="p-6 font-black italic">Compétence</th>
+                        <th class="p-6 font-black italic">Maîtrise</th>
+                        <th class="p-6 font-black italic">Feedback</th>
+                        <th class="p-6 font-black italic text-right">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="text-white/80 divide-y divide-white/5">
+                    @forelse($corrections as $correction)
+                    <tr class="hover:bg-cyan-400/[0.03] transition-colors group">
+                        <td class="p-6">
+                            <div class="flex flex-col">
+                                <span class="font-black text-xs uppercase italic text-white group-hover:text-cyan-400 transition-colors">
+                                    {{ $correction->brief->nom ?? '-' }}
+                                </span>
+                                <span class="text-[9px] text-white/30 uppercase tracking-widest mt-1">
+                                    {{ $correction->formateur->username ?? 'Formateur' }}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="p-6">
+                            <span class="bg-white/5 px-3 py-1.5 rounded-xl text-[9px] font-bold border border-white/10 uppercase italic text-cyan-400/80">
+                                {{ $correction->competence->nom ?? '-' }}
+                            </span>
+                        </td>
+                        <td class="p-6">
+                            @php
+                                $statusClasses = [
+                                    'TRANSPOSER' => 'bg-green-500/10 text-green-400 border-green-500/20',
+                                    'ADAPTER' => 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+                                    'IMITER' => 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
+                                ];
+                                $currentClass = $statusClasses[$correction->niveau_maitrise] ?? 'bg-white/5 text-white/40 border-white/10';
+                            @endphp
+                            <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border {{ $currentClass }}">
+                                {{ $correction->niveau_maitrise }}
+                            </span>
+                        </td>
+                        <td class="p-6">
+                            <p class="text-[11px] leading-relaxed italic text-white/60 max-w-xs line-clamp-2 hover:line-clamp-none transition-all cursor-help">
+                                "{{ $correction->commentaire }}"
+                            </p>
+                        </td>
+                        <td class="p-6 text-right">
+                            <span class="text-[10px] font-black text-white/40 uppercase italic">
+                                {{ $correction->created_at->format('d/m/Y') }}
+                            </span>
+                            <div class="text-[8px] text-cyan-400/30 font-bold tracking-tighter uppercase">
+                                {{ $correction->created_at->format('H:i') }}
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="p-12 text-center">
+                            <div class="flex flex-col items-center gap-4 opacity-20">
+                                <i class="fas fa-folder-open text-4xl text-cyan-400"></i>
+                                <p class="uppercase tracking-[0.4em] text-[10px] font-black italic">Aucune évaluation pour le moment</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+        </main>
+    </div>
     <div id="RenduModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-[70] flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-lg p-10 rounded-[2.5rem] border border-cyan-400/30 animate-fade-in">
             <div class="flex justify-between items-center mb-8">

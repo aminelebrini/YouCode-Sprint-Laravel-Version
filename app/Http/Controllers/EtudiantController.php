@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Brief;
 use App\Models\User;
 use App\Models\Etudiant;
+use App\Models\Evaluation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Services\EtudiantService;
@@ -40,11 +41,15 @@ class EtudiantController extends Controller
         $briefs = Brief::all();
         $formateurIds = $etudiant->classe->formateurs->pluck('id');
         $briefs = Brief::whereIn('formateur_id', $formateurIds)->get();
+        $corrections = Evaluation::where('etudiant_id', Auth::user()->id)
+                    ->with(['brief', 'competence', 'formateur'])
+                    ->get();
         return view('etudiantdash',
             [
                 'title' => "Formateur Dashboard",
                 'briefs' => $briefs,
-                'etudiants' => $etudiant
+                'etudiants' => $etudiant,
+                'corrections' => $corrections
             ]);
     }
 }
